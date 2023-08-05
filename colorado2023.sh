@@ -154,6 +154,7 @@ git cat-file -p  efbd263bc3503e5ebc193a8051ee264b461f89bf
 # Refs 
 #######################################
 git checkout -b feature/my-feature HEAD~1
+
 tee README.txt <<- EOF
 # About Git
 Git is a version control system that is great.
@@ -176,7 +177,15 @@ cat .git/refs/heads/feature/my-feature
 cat .git/refs/heads/main
 # 14b9461af873c97374fc05c5c89dcb5f3feb781d
 
-git tag v1.0.0 6324ca
+git reset --hard main
+cat .git/refs/heads/feature/my-feature
+# 14b9461af873c97374fc05c5c89dcb5f3feb781d
+
+git reset --hard e4559a86c0c97112355f9d4bfae7e849a37547d1
+cat .git/refs/heads/feature/my-feature
+# e4559a86c0c97112355f9d4bfae7e849a37547d1
+
+git tag v1.0.0 6324ca91555c232c2c72968c9b099f9d809e1710
 
 cat .git/refs/tags/v1.0.0
 # 6324ca91555c232c2c72968c9b099f9d809e1710
