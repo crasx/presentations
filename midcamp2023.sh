@@ -59,6 +59,7 @@ ls .git/objects/55/7db03de997c86a4a028e1ebd3a1ceb225be238
 
 mkdir docroot
 echo "Hello World" > docroot/index.html
+
 git add .
 git ls-files --stage
 # 100644 557db03de997c86a4a028e1ebd3a1ceb225be238 0	README.txt
@@ -111,6 +112,15 @@ git cat-file -p b0bd244
 
 # My second Commit.
 
+find .git/objects -type f
+# .git/objects/c9/110285d550c9069501c971d4e1bcc5f17652d5
+# .git/objects/3a/b7ccb93843bd2d542772700310f3aa3fe09710
+# .git/objects/e1/cce10baf150e809cfb4ca36ec1e6a0f5bdf939
+# .git/objects/6b/ab6ce1da88421911654b7e00667cd3d4103033
+# .git/objects/3e/e01922c53a547b1f51e86cc935cc93005f6d0e
+# .git/objects/55/7db03de997c86a4a028e1ebd3a1ceb225be238
+# .git/objects/ef/bd263bc3503e5ebc193a8051ee264b461f89bf
+
 
 git cat-file -p  6bab6ce
 # 100644 blob 3ab7ccb93843bd2d542772700310f3aa3fe09710	README.txt
@@ -122,6 +132,18 @@ git cat-file -p  efbd263bc3503e5ebc193a8051ee264b461f89bf
 #######################
 # Refs 
 
+cat .git/refs/heads/branchA
+# cccccc
+
+cat .git/refs/heads/branchB
+# eeeeee
+
+git checkout -b branchC dddddd
+git tag v1.0.0 dddddd
+
+cat .git/refs/tags/v1.0.0
+# dddddd
+
 git checkout -b branchA
 # Switched to a new branch 'branchA'
 
@@ -132,50 +154,32 @@ git tag v1.0.0 branchA
 cat .git/refs/tags/v1.0.0
 # b0bd24491f261bda70264b40adcc5383477a870c
 
-git checkout -b branchB
-# Switched to a new branch 'branchB'
 
 git reset --hard HEAD~1
 cat .git/refs/heads/branchB
 # ecdbef6df53c34fe1bed6a81df01dcf67f08cb37
 
-echo 'Conflicting text'  | git hash-object -w --stdin
-# 8fa1d98c80e663f1bf180e563f9d17d0bce70c9a
 
-echo 'Conflicting text' > README.txt
-git diff 
+git diff aaaaaa branchB
 # diff --git a/README.txt b/README.txt
-# index 557db03..8fa1d98 100644
+# index 557db0..a4a91cf 100644
 # --- a/README.txt
 # +++ b/README.txt
 # @@ -1 +1 @@
 # -Hello World
-# +Conflicting text
+# +Git rules!
 
-git diff branchA 
+
+git diff aaaaaa branchA 
 # diff --git a/README.txt b/README.txt
-# index 3ab7ccb..8fa1d98 100644
+# index 557db0..3f303f0d 100644
 # --- a/README.txt
 # +++ b/README.txt
 # @@ -1 +1 @@
-# -Git rules
-# +Conflicting text
+# -Hello World
+# +Git stinks
 
 
-
-git add .
-git commit -m "Causing trouble."
-# [branchB eaecc4c] Causing trouble.
-# 1 file changed, 1 insertion(+), 1 deletion(-)
-
-git log --graph --all --oneline
-# * b0bd244 (main, branchA) My second Commit.
-# | * e88ba8e (HEAD -> branchB) Causing trouble.
-# |/  
-# * ecdbef6 My first commit
-
-
-git diff 
 
 git merge branchA
 # Auto-merging README.txt
@@ -184,47 +188,33 @@ git merge branchA
 
 cat README.txt 
 # <<<<<<< HEAD
-# Conflicting text
+# Git rules!
 # =======
-# Git rules
+# Git stinks
 # >>>>>>> branchA
 
-# Resolve conflicts
-echo 'Git rules' > README.txt
+git ls-files --stage
+# 100644 557db03de997c86a4a028e1ebd3a1ceb225be238 1	README.txt
+# 100644 3f303f0d0de3cce5ce68dc6e39733fe4bb7c7409 2	README.txt
+# 100644 a4a91cff6860bf14afa570c7753e2b83e2ea9350 3	README.txt
+# 100644 557db03de997c86a4a028e1ebd3a1ceb225be238 	0	docroot/index.html
+
+echo "Git rules\!" > README.txt
 git add .
-git commit  
-# [branchB db3da6d] Merge branch 'branchA' into branchB
 
-git cat-file -p db3da6d
-# tree 5ebf97c32a6c986419d29f4809f4bd7540f5d570
-# parent e88ba8e97c49f45d144868839c3f104a4d78c7a0
-# parent b0bd24491f261bda70264b40adcc5383477a870c
-# author Matthew Ramir <matthew.ramir@gmail.com> 1700000000 -0700
-# committer Matthew Ramir <matthew.ramir@gmail.com> 1700000000 -0700
+git ls-files --stage           
+# 100644 3f303f0d0de3cce5ce68dc6e39733fe4bb7c7409 0	README.txt
+# 100644 557db03de997c86a4a028e1ebd3a1ceb225be238 0	docroot/index.html
 
-# Merge branch 'branchA' into branchB
+ 
+git commit 
+# [branchB ffffff] Merge branch 'branchA'
 
+git cat-file -p ffffff
+# tree e9327ec...
+# parent cccccc
+# parent eeeeee
+# author Matthew Ramir <matthew.ramir@gmail.com> 1700000000 -0600
+# committer Matthew Ramir <matthew.ramir@gmail.com> 1700000000 -0600
 
-
-#####
-
-cat .git/refs/heads/mybranch
-# 02963a68bca569aecee8d8b1a8dca8c72f4ac593
-
-cat .git/refs/tags/mytag
-# 02963a68bca569aecee8d8b1a8dca8c72f4ac593
-
-
- git merge foo2 --no-ff
-
-git cat-file -p 306b607
-# tree 5ac9c69c561a5658633cc7f6be3df29050663fcb
-# parent 2b1b1576dc42aff19e40dce2e6df6210b20de7a0
-# parent 1e9e652718d1fb34691b02abb375a29077e7a41f
-# author Matthew Ramir <matthew.ramir@gmail.com> 1681135566 -0600
-# committer Matthew Ramir <matthew.ramir@gmail.com> 1681135566 -0600
-#
-# Merge branch 'foo2'
-
-git checkout -b mybranch
-git tag mytag
+# Merge branch 'branchA'
